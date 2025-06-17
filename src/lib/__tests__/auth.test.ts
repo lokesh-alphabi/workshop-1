@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import bcrypt from "bcryptjs";
-import { db } from "../db";
 import { LoginSchema } from "../validation/auth";
 
 // Mock the database

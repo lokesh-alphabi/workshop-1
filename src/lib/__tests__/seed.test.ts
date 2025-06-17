@@ -331,7 +331,6 @@ describe("Root Admin Seed Script", () => {
 
   describe("Error Handling", () => {
     it("should handle database connection errors gracefully", () => {
-      const mockError = new Error("Connection failed");
 
       expect(() => {
         throw new Error(
@@ -374,12 +373,7 @@ describe("Root Admin Seed Script", () => {
     it("should measure execution time accurately", () => {
       const startTime = performance.now();
 
-      // Simulate some work
-      let sum = 0;
-      for (let i = 0; i < 1000; i++) {
-        sum += i;
-      }
-
+   
       const endTime = performance.now();
       const executionTime = endTime - startTime;
 

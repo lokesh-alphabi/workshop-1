@@ -24,7 +24,7 @@ export default async function DashboardPage() {
             Welcome back, {user.name}
           </h1>
           <p className="text-gray-600">
-            Here's your project management overview
+            {`Here's your project management overview`}
           </p>
         </div>
 

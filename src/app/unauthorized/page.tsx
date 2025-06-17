@@ -40,8 +40,8 @@ export default async function UnauthorizedPage() {
           </h1>
 
           <p className="mt-4 text-lg text-gray-600">
-            You don't have permission to access this resource.
-          </p>
+            {`You don't have permission to access this resource.`}
+            </p>
 
           {session?.user && (
             <div className="mt-4 p-4 bg-gray-100 rounded-md">
