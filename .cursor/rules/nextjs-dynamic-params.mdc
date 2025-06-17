@@ -1,0 +1,111 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Next.js App Router Dynamic Parameters Guidelines
+
+## Important Rules
+
+When working with dynamic route segments in Next.js App Router, always follow these rules:
+
+### 1. Route Handlers (API Routes)
+
+In route handlers, dynamic parameters must be treated as a Promise that needs to be awaited:
+
+```typescript
+// CORRECT ✅
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  // Use the id...
+}
+
+// INCORRECT ❌
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id; // Will cause type errors and build failures
+  // ...
+}
+```
+
+### 2. Page Components
+
+Similarly, in page components that use dynamic route segments, params must be treated as a Promise:
+
+```typescript
+// CORRECT ✅
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params;
+  return <div>My Post: {slug}</div>
+}
+
+// INCORRECT ❌
+export default async function Page({
+  params,
+}: {
+  params: { slug: string }
+}) {
+  return <div>My Post: {params.slug}</div> // Will cause type errors and build failures
+}
+```
+
+## Common Patterns
+
+### Extracting Multiple Parameters
+
+When working with multiple dynamic segments:
+
+```typescript
+// Route: /app/blog/[category]/[post]/page.tsx
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ category: string; post: string }>;
+}) {
+  const { category, post } = await params;
+  // Now you can use both category and post
+}
+```
+
+### Type Safety with TypeScript
+
+For better type safety, define your param types:
+
+```typescript
+type PostParams = {
+  slug: string;
+};
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<PostParams>;
+}) {
+  const { slug } = await params;
+  // ...
+}
+```
+
+## Troubleshooting
+
+If you encounter build errors like:
+
+```
+Type error: Route has an invalid export:
+Type "{ params: { id: string; }; }" is not a valid type for the function's second argument.
+```
+
+This usually means you're not handling the params as a Promise. Update your code to follow the patterns above.
+
+## Why This Matters
+
+This pattern is required because Next.js internally handles dynamic parameters asynchronously in the App Router. Treating params as a Promise ensures your code will work correctly with Next.js's routing system and prevents build errors.

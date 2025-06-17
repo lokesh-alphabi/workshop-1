@@ -1,0 +1,175 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Next.js useSearchParams Rules & Best Practices
+
+## 🚨 CRITICAL RULE: Always Wrap in Suspense Boundary
+
+**When using `useSearchParams` in Next.js, you MUST wrap the component in a `<Suspense>` boundary to prevent rendering issues.**
+
+## Why This Rule Exists
+
+- `useSearchParams` is a **Client Component hook only**
+- In statically rendered routes, it causes the entire Client Component tree up to the closest Suspense boundary to be client-side rendered
+- Without Suspense, this can break static rendering optimization and cause hydration issues
+
+## ✅ Correct Implementation Pattern
+
+### 1. Create the Component Using useSearchParams
+
+```tsx
+// components/SearchBar.tsx
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+
+export default function SearchBar() {
+  const searchParams = useSearchParams()
+  const search = searchParams.get('search')
+  
+  return <>Search: {search}</>
+}
+```
+
+### 2. Create a Fallback Component
+
+```tsx
+// components/SearchBarFallback.tsx
+function SearchBarFallback() {
+  return <>Loading search...</>
+}
+```
+
+### 3. Wrap in Suspense Boundary in Parent Component
+
+```tsx
+// app/dashboard/page.tsx
+import { Suspense } from 'react'
+import SearchBar from './SearchBar'
+
+function SearchBarFallback() {
+  return <>Loading search...</>
+}
+
+export default function Page() {
+  return (
+    <>
+      <nav>
+        <Suspense fallback={<SearchBarFallback />}>
+          <SearchBar />
+        </Suspense>
+      </nav>
+      <h1>Dashboard</h1>
+    </>
+  )
+}
+```
+
+## ❌ Common Mistakes to Avoid
+
+### Don't Use Without Suspense
+```tsx
+// ❌ WRONG - Missing Suspense boundary
+export default function Page() {
+  return (
+    <>
+      <SearchBar /> {/* This will cause issues */}
+      <h1>Dashboard</h1>
+    </>
+  )
+}
+```
+
+### Don't Use in Server Components
+```tsx
+// ❌ WRONG - useSearchParams only works in Client Components
+export default function ServerPage() {
+  const searchParams = useSearchParams() // Error!
+  return <div>Content</div>
+}
+```
+
+## 📋 Implementation Checklist
+
+Before using `useSearchParams`, ensure:
+
+- [ ] Component has `'use client'` directive
+- [ ] Component is wrapped in `<Suspense>` boundary
+- [ ] Fallback component is provided
+- [ ] Parent component imports `Suspense` from React
+- [ ] Consider if Server Component alternatives are available
+
+## 🔄 Alternative Approaches
+
+### For Server Components (Pages)
+Use the `searchParams` prop instead:
+```tsx
+// app/dashboard/page.tsx - Server Component
+export default function Page({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
+  const search = searchParams.search
+  return <div>Search: {search}</div>
+}
+```
+
+### For Dynamic Rendering
+If the route is dynamically rendered, you can use `useSearchParams` without Suspense, but still wrap it for consistency:
+
+```tsx
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchBar />
+    </Suspense>
+  )
+}
+```
+
+## 🎯 Key Takeaways
+
+1. **Always wrap `useSearchParams` components in Suspense**
+2. **Provide meaningful fallback components**
+3. **Consider Server Component alternatives when possible**
+4. **Use the `searchParams` prop in Server Components (Pages only)**
+5. **Remember: Layouts don't receive `searchParams` prop**
+
+## 📚 Quick Reference Template
+
+```tsx
+// Template for useSearchParams usage
+import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+
+// 1. Client Component with useSearchParams
+function MySearchComponent() {
+  const searchParams = useSearchParams()
+  // Your logic here
+  return <div>Content</div>
+}
+
+// 2. Fallback component
+function MySearchFallback() {
+  return <div>Loading...</div>
+}
+
+// 3. Parent with Suspense boundary
+export default function ParentPage() {
+  return (
+    <Suspense fallback={<MySearchFallback />}>
+      <MySearchComponent />
+    </Suspense>
+  )
+}
+```
+
+---
+
+**Remember: Every time you see `useSearchParams`, think `<Suspense>`!**

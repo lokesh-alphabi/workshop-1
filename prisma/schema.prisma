@@ -1,0 +1,278 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// User role enumeration supporting hierarchical permissions
+/// ROOT_ADMIN: Complete system access, can create other admins
+/// ADMIN: Can create projects and manage users
+/// EMPLOYEE: Base level user, requires project-level permissions
+enum UserRole {
+  ROOT_ADMIN
+  ADMIN
+  EMPLOYEE
+}
+
+/// Core user entity for authentication and authorization
+/// Supports hierarchical role-based access control
+model User {
+  /// Primary key using UUID to prevent enumeration attacks
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  /// Unique email address for authentication
+  /// Indexed for fast login lookups
+  email String @unique @db.VarChar(255)
+
+  /// Bcrypt hashed password with minimum 12 salt rounds
+  /// Never store plain text passwords
+  passwordHash String @map("password_hash") @db.VarChar(255)
+
+  /// Hierarchical role defining system-level permissions
+  /// Determines access to administrative functions
+  role UserRole
+
+  /// Display name for user identification
+  /// Used in UI and assignment displays
+  name String @db.VarChar(255)
+
+  /// Account security and audit fields
+  /// Track login patterns and security events
+  lastLogin        DateTime? @map("last_login") @db.Timestamptz(6)
+  failedLoginAttempts Int @default(0) @map("failed_login_attempts")
+  lockedUntil      DateTime? @map("locked_until") @db.Timestamptz(6)
+
+  /// Audit timestamps for tracking user lifecycle
+  /// Automatically managed by database triggers
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  /// Relationships
+  /// Projects created by this user (for Admin/Root Admin roles)
+  createdProjects Project[] @relation("ProjectCreator")
+  
+  /// Project memberships with role-based access
+  projectMemberships ProjectMember[]
+  
+  /// Work items created by this user
+  createdWorkItems WorkItem[] @relation("WorkItemCreator")
+  
+  /// Work items assigned to this user
+  assignedWorkItems WorkItem[] @relation("WorkItemAssignee")
+  
+  /// Work items where this user is accountable
+  accountableWorkItems WorkItem[] @relation("WorkItemAccountable")
+
+  /// Database constraints and indexes
+  @@map("users")
+  @@index([email], name: "idx_users_email")
+  @@index([role], name: "idx_users_role")
+  @@index([createdAt], name: "idx_users_created_at")
+}
+
+/// Project entity for organizing work and team collaboration
+/// Supports client information and date-based planning
+model Project {
+  /// Primary key using UUID
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  /// Project identification and description
+  name String @db.VarChar(255)
+  description String? @db.Text
+
+  /// Client information for project context
+  clientName String? @map("client_name") @db.VarChar(255)
+  clientTeamMembers String? @map("client_team_members") @db.Text
+
+  /// Project timeline for planning and tracking
+  startDate DateTime @map("start_date") @db.Date
+  endDate   DateTime @map("end_date") @db.Date
+
+  /// Project creator reference
+  createdBy String @map("created_by") @db.Uuid
+  creator   User   @relation("ProjectCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  /// Audit timestamps
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  /// Relationships
+  /// Team members with project-specific roles
+  members ProjectMember[]
+  
+  /// Work items belonging to this project
+  workItems WorkItem[]
+  
+  /// Sprints for agile project management
+  sprints Sprint[]
+
+  @@map("projects")
+  @@index([createdBy], name: "idx_projects_created_by")
+  @@index([startDate], name: "idx_projects_start_date")
+  @@index([endDate], name: "idx_projects_end_date")
+}
+
+/// Project-level role enumeration for granular permissions
+/// Defines specific capabilities within project context
+enum ProjectRole {
+  OWNER    // Full project control, can manage settings and members
+  MANAGER  // Can manage work items and assign tasks
+  DEVELOPER // Can create/update work items and change status
+  TESTER   // Can update status, create bugs, manage testing workflows
+}
+
+/// Junction table for user-project relationships with roles
+/// Supports many-to-many relationship with role-based permissions
+model ProjectMember {
+  /// Primary key using UUID
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  /// User reference
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// Project reference
+  projectId String  @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  /// Project-specific role defining permissions within this project
+  role ProjectRole
+
+  /// Assignment timestamp for audit trail
+  assignedAt DateTime @default(now()) @map("assigned_at") @db.Timestamptz(6)
+
+  /// Ensure unique user-project combinations
+  @@unique([userId, projectId], name: "unique_user_project")
+  @@map("project_members")
+  @@index([userId], name: "idx_project_members_user_id")
+  @@index([projectId], name: "idx_project_members_project_id")
+  @@index([role], name: "idx_project_members_role")
+}
+
+/// Work item type enumeration for different kinds of work
+/// Supports flexible project organization and tracking
+enum WorkItemType {
+  EPIC   // High-level feature or initiative
+  STORY  // User story or feature requirement
+  TASK   // Specific work item or development task
+  BUG    // Defect or issue to be resolved
+}
+
+/// Priority levels for work item importance and urgency
+/// Supports proper work prioritization and scheduling
+enum Priority {
+  IMMEDIATE // Critical issues requiring immediate attention
+  HIGH      // Important work with high business value
+  NORMAL    // Standard priority work items
+  LOW       // Nice-to-have features or improvements
+}
+
+/// Status workflow for work item lifecycle management
+/// Supports flexible development and testing processes
+enum WorkItemStatus {
+  FUTURE        // Not yet planned or scheduled
+  IN_PLANNING   // Being planned, refined, or estimated
+  IN_PROGRESS   // Actively being worked on
+  IN_TESTING    // Under testing, review, or quality assurance
+  HOLD          // Temporarily blocked or paused
+  IN_DISCUSSION // Requires discussion, decision, or clarification
+  DONE          // Completed and ready for delivery
+}
+
+/// Core work item entity for project task management
+/// Supports hierarchical relationships and agile methodologies
+model WorkItem {
+  /// Primary key using UUID
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  /// Work item identification and details
+  title       String @db.VarChar(255)
+  description String? @db.Text
+
+  /// Work item classification and priority
+  type     WorkItemType
+  priority Priority      @default(NORMAL)
+  status   WorkItemStatus @default(FUTURE)
+
+  /// Agile estimation using Fibonacci sequence
+  /// Null indicates unestimated work
+  storyPoints Int? @map("story_points")
+
+  /// Assignment and accountability
+  assigneeId String @map("assignee_id") @db.Uuid
+  assignee   User   @relation("WorkItemAssignee", fields: [assigneeId], references: [id])
+
+  /// Optional accountable person (can be same as assignee)
+  accountableId String? @map("accountable_id") @db.Uuid
+  accountable   User?   @relation("WorkItemAccountable", fields: [accountableId], references: [id])
+
+  /// Hierarchical relationships for work breakdown
+  parentId String? @map("parent_id") @db.Uuid
+  parent   WorkItem? @relation("WorkItemHierarchy", fields: [parentId], references: [id])
+  children WorkItem[] @relation("WorkItemHierarchy")
+
+  /// Project association
+  projectId String  @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  /// Sprint assignment for agile planning
+  sprintId String? @map("sprint_id") @db.Uuid
+  sprint   Sprint? @relation(fields: [sprintId], references: [id])
+
+  /// Completion tracking for burndown calculations
+  completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+
+  /// Creator and audit information
+  createdBy String   @map("created_by") @db.Uuid
+  creator   User     @relation("WorkItemCreator", fields: [createdBy], references: [id])
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("work_items")
+  @@index([projectId], name: "idx_work_items_project_id")
+  @@index([assigneeId], name: "idx_work_items_assignee_id")
+  @@index([status], name: "idx_work_items_status")
+  @@index([type], name: "idx_work_items_type")
+  @@index([priority], name: "idx_work_items_priority")
+  @@index([sprintId], name: "idx_work_items_sprint_id")
+  @@index([parentId], name: "idx_work_items_parent_id")
+  @@index([completedAt], name: "idx_work_items_completed_at")
+}
+
+/// Sprint entity for agile iteration planning and tracking
+/// Supports time-boxed development cycles with clear goals
+model Sprint {
+  /// Primary key using UUID
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  /// Sprint identification and planning
+  name        String @db.VarChar(255)
+  goal        String? @db.Text
+  startDate   DateTime @map("start_date") @db.Date
+  endDate     DateTime @map("end_date") @db.Date
+
+  /// Project association
+  projectId String  @map("project_id") @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  /// Work items assigned to this sprint
+  workItems WorkItem[]
+
+  /// Audit timestamps
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("sprints")
+  @@index([projectId], name: "idx_sprints_project_id")
+  @@index([startDate], name: "idx_sprints_start_date")
+  @@index([endDate], name: "idx_sprints_end_date")
+}

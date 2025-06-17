@@ -1,0 +1,135 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Cursor Dependency Management Rule
+
+## Purpose
+This rule establishes a protocol for Cursor to follow whenever code requiring external dependencies (libraries, packages, frameworks, etc.) are needed, ensuring user approval before implementation and preventing any automatic installations.
+
+## 🚨 CRITICAL RULE: NO AUTOMATIC INSTALLATIONS
+
+**Cursor MUST NEVER install, suggest installation commands, or assume any package/library choice without explicit user approval. Always ask first with specific suggestions.**
+
+## The Rule in Detail
+
+1. **Dependency Requirement Notification**
+   - When Cursor determines that external dependencies are needed, it must PAUSE implementation immediately.
+   - Cursor must clearly state what type of dependency is needed and why.
+   - Provide specific suggestions for popular options in that category.
+   - Example: "I need to add a validation library to handle form validation and data parsing."
+
+2. **Direct Library Approval Request with Suggestions**
+   - Cursor must ask the user which specific library/package they want to use.
+   - ALWAYS provide 3-5 popular suggestions for the dependency type.
+   - Include brief descriptions of why each option might be chosen.
+   - Example: "Which validation library would you like to use?
+     - **Zod** - TypeScript-first schema validation with excellent type inference
+     - **Yup** - Popular object schema validation with wide ecosystem support
+     - **Joi** - Feature-rich validation library with extensive API
+     - **Valibot** - Lightweight alternative with modular design
+     - Or specify another validation library you prefer"
+
+3. **Implementation Authorization**
+   - Cursor must wait for explicit user selection before proceeding.
+   - Only after receiving clear approval should Cursor implement code using the chosen dependency.
+   - Example response: "I'll use Zod as requested for validation."
+
+4. **Package Installation Information (User Responsibility)**
+   - When implementing, Cursor should provide the installation command for user reference.
+   - Make it clear that the USER needs to run the installation command.
+   - Example: "You'll need to install the package first: `npm install zod`"
+   - NEVER attempt to run installation commands automatically.
+
+## Common Dependency Categories & Suggestions
+
+### Validation Libraries
+**When validation is needed:**
+- **Zod** - TypeScript-first schema validation
+- **Yup** - Popular object schema validation
+- **Joi** - Feature-rich validation library
+- **Valibot** - Lightweight modular validation
+
+### State Management
+**When state management is needed:**
+- **Zustand** - Lightweight and simple state management
+- **Redux Toolkit** - Official Redux with modern patterns
+- **Jotai** - Atomic state management
+- **Valtio** - Proxy-based state management
+
+### UI Component Libraries
+**When UI components are needed:**
+- **shadcn/ui** - Copy-paste components with Tailwind CSS
+- **Material-UI (MUI)** - React implementation of Material Design
+- **Ant Design** - Enterprise-focused design language
+- **Chakra UI** - Simple and modular component library
+
+### HTTP Client Libraries
+**When API calls are needed:**
+- **Axios** - Feature-rich HTTP client
+- **Fetch API** - Native browser API (no dependency)
+- **ky** - Tiny and elegant HTTP client
+- **SWR** - Data fetching with caching
+
+### Form Libraries
+**When form handling is needed:**
+- **React Hook Form** - Performant forms with minimal re-renders
+- **Formik** - Popular form library with validation
+- **React Final Form** - High performance subscription-based form state
+- **TanStack Form** - Type-safe form state management
+
+### Date/Time Libraries
+**When date manipulation is needed:**
+- **date-fns** - Modern utility library for dates
+- **Day.js** - Lightweight alternative to Moment.js
+- **Luxon** - DateTime library with timezone support
+- **Native Date** - Browser native (no dependency)
+
+### Testing Libraries
+**When testing utilities are needed:**
+- **Vitest** - Fast unit test framework
+- **Jest** - Popular testing framework
+- **Testing Library** - Simple testing utilities
+- **Playwright** - End-to-end testing
+
+## Example Workflow
+
+```
+Cursor: I need to add a validation library to handle user input validation and type-safe data parsing.
+
+Cursor: Which validation library would you like to use?
+- **Zod** - TypeScript-first schema validation with excellent type inference
+- **Yup** - Popular object schema validation with wide ecosystem support  
+- **Joi** - Feature-rich validation library with extensive API
+- **Valibot** - Lightweight alternative with modular design
+- Or specify another validation library you prefer
+
+User: Let's use Zod.
+
+Cursor: I'll use Zod as requested for validation. You'll need to install it first: `npm install zod`
+
+[Cursor proceeds with implementation using Zod]
+```
+
+## Enforcement Rules
+
+1. **NEVER assume** what library the user wants to use
+2. **NEVER auto-install** or suggest running installation commands automatically
+3. **ALWAYS provide suggestions** with brief explanations
+4. **ALWAYS wait** for explicit user approval
+5. **CLEARLY state** what the user needs to install manually
+
+## Benefits
+
+This rule ensures:
+- ✅ User maintains full control over dependency choices
+- ✅ No surprise installations or package modifications
+- ✅ Educational value through suggested alternatives
+- ✅ Prevents dependency bloat from unnecessary packages
+- ✅ Allows users to align with existing project standards
+- ✅ Encourages informed decision-making about dependencies
+
+---
+
+**Remember: Ask first, suggest options, wait for approval, then implement. Never install anything automatically.**

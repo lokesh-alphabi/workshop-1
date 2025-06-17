@@ -1,0 +1,272 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Auto Cleanup Rules
+
+## 🚨 CRITICAL RULE: Always Ask Before Making ANY Changes
+
+**Cursor MUST NEVER automatically fix, clean, or modify code without explicit user permission. Always show what will be changed and ask for approval first.**
+
+## Task Completion Workflow
+
+When any task is complete (coding, debugging, feature implementation, etc.):
+
+### 1. ESLint & Type Error Check
+- **Always run ESLint** on the current file/project
+- **Run TypeScript compiler check** if applicable
+- **List all errors and warnings found** with severity levels
+- **Ask permission before fixing**: "I found X ESLint errors and Y TypeScript errors. Should I fix them?"
+- **Show detailed preview** of what will be changed with before/after examples
+- **Fix in priority order**:
+  1. **Critical errors** (syntax errors, type errors)
+  2. **Security issues** (potential vulnerabilities)
+  3. **Performance issues** (inefficient patterns)
+  4. **Style/formatting issues** (prettier, spacing)
+  5. **Best practice violations** (naming conventions, etc.)
+
+### 2. Code Quality Assessment
+After linting fixes (if approved), check for:
+
+#### **Unused Code Detection**
+- Unused variables and constants
+- Unused imports and require statements
+- Unused function declarations
+- Unused React components
+- Unreachable code blocks
+- Dead CSS classes (if applicable)
+
+#### **Code Optimization Opportunities**
+- Redundant code patterns
+- Inefficient algorithms or loops
+- Missing error handling
+- Unoptimized database queries
+- Large bundle imports that could be tree-shaken
+
+#### **Modern Best Practices**
+- Outdated patterns that have modern alternatives
+- Missing TypeScript types
+- Non-async/await patterns that could be modernized
+- Missing React hooks optimizations (useMemo, useCallback)
+
+### 3. Enhanced Safety Rules
+- **NEVER make changes without explicit approval**
+- **Always show before/after comparisons**
+- **Preserve all exported functions/variables/components**
+- **Keep all public class methods and properties**
+- **Preserve items marked with `@keep-unused` or `@preserve` comments**
+- **Don't auto-remove console.log, debugger, or TODO comments** (ask first)
+- **Preserve all test files and their unused imports**
+- **Keep configuration files intact** (unless specifically requested)
+- **Don't modify package.json dependencies** without permission
+
+### 4. Project-Specific Considerations
+
+#### **Next.js Projects**
+- Check for proper `'use client'` directives
+- Verify proper Server/Client Component usage
+- Check for missing Suspense boundaries with `useSearchParams`
+- Validate metadata and SEO optimizations
+
+#### **React Projects**
+- Check for missing React imports (if using older versions)
+- Verify proper hook dependencies
+- Check for unnecessary re-renders
+- Validate proper state management patterns
+
+#### **TypeScript Projects**
+- Check for missing type definitions
+- Verify proper interface usage
+- Check for `any` types that could be more specific
+- Validate generic type constraints
+
+#### **Database Projects**
+- Check for SQL injection vulnerabilities
+- Verify proper connection handling
+- Check for missing error handling in queries
+- Validate proper data validation
+
+### 5. Multi-Stage Approval Process
+
+#### **Stage 1: Critical Fixes**
+```
+"Found 3 critical errors that may break functionality:
+1. Missing semicolon causing syntax error (line 45)
+2. Undefined variable 'userdata' (line 67) 
+3. Type error: Property 'id' does not exist (line 23)
+
+Fix these critical issues? [Y/N]"
+```
+
+#### **Stage 2: Code Quality Improvements**
+```
+"Found 5 code quality improvements:
+1. Remove unused import 'lodash' (line 3)
+2. Remove unused variable 'tempData' (line 15)
+3. Add missing error handling for API call (line 34)
+4. Optimize: Use const instead of let for 'config' (line 12)
+5. Performance: Add useMemo for expensive calculation (line 45)
+
+Apply these improvements? [Y/N]"
+```
+
+#### **Stage 3: Style & Formatting**
+```
+"Found 8 style/formatting issues:
+- 3 missing spaces around operators
+- 2 inconsistent quote styles
+- 3 trailing whitespace issues
+
+Apply formatting fixes? [Y/N]"
+```
+
+### 6. Languages & Frameworks Covered
+
+#### **Primary Support**
+- **JavaScript/TypeScript** (ES6+, Node.js)
+- **React** (Hooks, Components, JSX)
+- **Next.js** (App Router, Pages Router)
+- **Vue.js** (Composition API, Options API)
+- **Svelte/SvelteKit**
+
+#### **Secondary Support**
+- **Python** (PEP 8, type hints)
+- **Java** (Spring Boot, Maven/Gradle)
+- **C#** (.NET, ASP.NET)
+- **Go** (gofmt, golint)
+- **Rust** (clippy, rustfmt)
+
+#### **Web Technologies**
+- **CSS/SCSS/Tailwind** (unused classes, optimization)
+- **HTML** (accessibility, semantic markup)
+- **SQL** (query optimization, security)
+- **GraphQL** (schema validation)
+
+### 7. Advanced Cleanup Features
+
+#### **Security Scan**
+- Check for hardcoded secrets or API keys
+- Validate input sanitization
+- Check for SQL injection vulnerabilities
+- Verify proper authentication patterns
+
+#### **Performance Analysis**
+- Identify expensive operations in render functions
+- Check for unnecessary API calls
+- Validate proper caching strategies
+- Check bundle size impact of imports
+
+#### **Accessibility Check**
+- Missing alt text on images
+- Missing ARIA labels
+- Improper heading hierarchy
+- Missing form labels
+
+### 8. Integration with Development Tools
+
+#### **ESLint Configuration**
+- Support for custom ESLint configs
+- Integration with project-specific rules
+- Support for multiple parser options
+- Custom rule severity handling
+
+#### **Prettier Integration**
+- Respect project formatting preferences
+- Support for custom Prettier configs
+- Handle conflicts between ESLint and Prettier
+
+#### **TypeScript Integration**
+- Use project's tsconfig.json settings
+- Respect strict mode configurations
+- Handle multiple TypeScript projects in monorepos
+
+### 9. Example Enhanced Workflow
+
+```
+Task: "Add user authentication feature"
+After completion:
+
+1. "Task complete! Running comprehensive code analysis..."
+
+2. "🔍 Analysis Results:
+   Critical Issues: 2
+   Code Quality: 4 improvements available
+   Style/Format: 6 minor issues
+   Security: 1 potential issue found"
+
+3. "🚨 CRITICAL - Fix these 2 issues first?
+   - Missing error handling for login API call (line 34)
+   - TypeScript error: Property 'token' possibly undefined (line 67)
+   
+   [Show detailed before/after] [Y/N]"
+
+4. [User approves] → Fix critical issues
+
+5. "✅ Critical issues fixed! 
+   
+   🔧 CODE QUALITY - Apply 4 improvements?
+   - Remove unused import 'moment' (line 3)
+   - Add useMemo for expensive validation (line 45)
+   - Extract magic string to constant (line 78)
+   - Add JSDoc comments for public functions
+   
+   [Show detailed changes] [Y/N]"
+
+6. [User approves] → Apply improvements
+
+7. "🎨 FORMATTING - Fix 6 style issues?
+   - Add consistent spacing (4 locations)
+   - Fix quote consistency (2 locations)
+   
+   [Y/N]"
+
+8. [User approves] → Apply formatting
+
+9. "🛡️ SECURITY - Found potential issue:
+   - API key might be exposed in client code (line 12)
+   
+   Should I help secure this? [Y/N]"
+
+10. "✅ All done! Code is clean, secure, and lint-free.
+    📊 Summary:
+    - Fixed 2 critical issues
+    - Applied 4 code improvements  
+    - Resolved 6 formatting issues
+    - Secured 1 potential vulnerability"
+```
+
+### 10. Quality Assurance Checklist
+
+Before completing any cleanup:
+
+- [ ] All changes have been explicitly approved by user
+- [ ] No functionality has been accidentally removed
+- [ ] All tests still pass (if applicable)
+- [ ] No breaking changes have been introduced
+- [ ] Security has not been compromised
+- [ ] Performance has not degraded
+- [ ] Accessibility has not been reduced
+- [ ] All critical errors have been addressed
+
+### 11. Rollback Safety
+
+- **Always mention how to undo changes**: "These changes can be reverted with Ctrl+Z"
+- **For large changes**: "Consider committing current state before applying these fixes"
+- **Backup important files** when making extensive modifications
+- **Provide clear instructions** for manual reversal if needed
+
+## Benefits
+
+This enhanced cleanup process ensures:
+- ✅ **User Control**: Never makes changes without permission
+- ✅ **Comprehensive Analysis**: Covers code quality, security, and performance
+- ✅ **Prioritized Fixes**: Handles critical issues first
+- ✅ **Educational Value**: Explains why changes are beneficial
+- ✅ **Safety First**: Multiple safeguards against unwanted modifications
+- ✅ **Modern Standards**: Follows current best practices
+- ✅ **Framework Aware**: Understands project-specific requirements
+
+---
+
+**Remember: The goal is to help improve code quality while maintaining complete user control and project safety.**

@@ -1,0 +1,90 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Cursor Story Development Workflow
+
+## Overview
+These instructions define how Cursor should process and implement user stories, requiring explicit approval of a development plan before beginning implementation.
+
+## Initial Processing
+1. When a user provides a story input, acknowledge receipt with a brief confirmation.
+2. Parse the story to identify key requirements, features, and constraints.
+3. If the story is unclear or lacks necessary details, ask specific clarifying questions before proceeding.
+
+## Development Plan Phase
+1. Create a structured, step-by-step development plan including:
+   - Requirements analysis summary
+   - Technical approach overview
+   - Implementation steps broken down into logical chunks
+   - Estimated complexity for each step
+   - Potential challenges or edge cases to consider
+   - Testing strategy
+   
+2. Present this plan to the user with a clear request for approval:
+   "Please review this development plan. Would you like to approve this approach or make any adjustments before implementation begins?"
+
+## Approval Process
+1. Wait for explicit user approval before proceeding to implementation.
+2. If the user suggests changes, revise the plan accordingly and seek approval again.
+3. If the user rejects the plan entirely, request feedback on what needs to be reconsidered.
+
+## Implementation Phase
+1. Once approved, clearly indicate that implementation is beginning.
+2. Follow the approved plan steps sequentially.
+3. For each major step completed, provide a brief status update.
+4. If implementation reveals unforeseen issues that require deviating from the plan, pause and seek user guidance.
+
+## Communication Standards
+1. Provide progress updates at logical completion points
+2. Format updates as: "Completed: [task], Next: [upcoming task]"
+3. Highlight blockers immediately with clear explanation of the issue
+4. Use code blocks and formatting for clarity when sharing code
+5. Maintain professional tone regardless of complexity or challenges
+
+## Code Style and Documentation
+1. Follow industry standard coding conventions for the language being used
+2. Include meaningful comments for complex logic
+3. Document public APIs with clear input/output descriptions
+4. Use consistent variable naming conventions
+5. Structure code for readability and maintainability
+6. Include inline documentation for non-obvious design decisions
+
+## Scope Management
+1. Strictly adhere to approved scope in implementation
+2. If user requests additional features during implementation:
+   - Acknowledge the request
+   - Indicate it's outside the approved scope
+   - Offer to either complete current implementation first or revise the plan
+3. Categorize feature requests as "Must Have," "Should Have," or "Nice to Have"
+4. Prioritize core functionality before enhancement features
+
+## Revision Policy
+1. Up to three rounds of minor revisions are included in the standard workflow
+2. Major revisions that change core functionality require a new development plan
+3. For revision requests, clearly identify what's changing and why
+4. Document all revisions with version numbers (v1, v2, etc.)
+5. Maintain previous versions for reference if significant changes are made
+
+## Edge Case Handling
+1. Proactively identify potential edge cases during planning
+2. Document assumptions made when requirements are ambiguous
+3. Implement graceful error handling and user feedback
+4. For unresolvable edge cases, document limitations clearly
+5. Offer alternative approaches for challenging scenarios
+
+## Security and Best Practices
+1. Follow OWASP security guidelines where applicable
+2. Implement input validation for all user-provided data
+3. Avoid hardcoded credentials or sensitive information
+4. Consider performance implications for resource-intensive operations
+5. Ensure accessibility compliance when developing user interfaces
+6. Apply the principle of least privilege in all implementations
+
+## Completion
+1. When implementation is complete, summarize what was accomplished
+2. Highlight any areas that may need further refinement or testing
+3. Provide a brief guide on usage/implementation if appropriate
+4. Ask if the user would like to make any adjustments to the implementation
+5. Include any recommendations for future enhancements

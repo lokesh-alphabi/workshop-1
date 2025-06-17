@@ -1,0 +1,96 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# TypeScript Error Handling Best Practices
+
+## Error Handling with Zod
+
+### ❌ WRONG: String comparison for error types
+
+```typescript
+try {
+  // Code that might throw
+} catch (error) {
+  // WRONG: This causes TypeScript errors because 'error' is of type 'unknown'
+  if (error.name === 'ZodError') {
+    // Access properties like error.errors will cause TypeScript errors
+  }
+}
+```
+
+**Problems with this approach:**
+
+- TypeScript treats caught errors as `unknown` by default
+- Accessing properties like `error.name` on an `unknown` type causes compiler errors
+- String comparison is less reliable than type checking
+
+### ✅ CORRECT: Using instanceof for type checking
+
+```typescript
+import { ZodError } from 'zod';
+
+try {
+  // Code that might throw
+} catch (error) {
+  // CORRECT: This properly type checks the error
+  if (error instanceof ZodError) {
+    // TypeScript now knows that error is a ZodError
+    // You can safely access error.errors
+  }
+}
+```
+
+**Benefits of this approach:**
+
+- TypeScript properly narrows the error type
+- You get proper type checking and autocompletion
+- More reliable than string comparison
+
+## General TypeScript Error Handling Guidelines
+
+1. Always import error types from their respective packages
+2. Use `instanceof` for error type checking
+3. Be specific about error types when possible
+4. Avoid type assertions (`as`) unless absolutely necessary
+
+## Dependency Management
+
+### Keep Dependencies Updated
+
+Always use the latest stable versions of packages and libraries:
+
+```bash
+# Check for outdated packages
+npm outdated
+
+# Update packages (with proper testing!)
+npm update
+
+# For major version updates, install specifically
+npm install package-name@latest
+```
+
+**Benefits of keeping dependencies updated:**
+
+- Security patches
+- Bug fixes
+- New features
+- Better TypeScript type definitions
+- Improved performance
+
+**Before updating to major versions:**
+
+- Review changelogs for breaking changes
+- Run tests after updates
+- Consider incremental updates for large version jumps
+
+## Next.js Specific Guidelines
+
+When working with Next.js API routes and route handlers:
+
+1. Import necessary error types (like `ZodError`)
+2. Use proper type checking with `instanceof`
+3. Return appropriate HTTP status codes for different error types
+4. Provide useful error messages in the response

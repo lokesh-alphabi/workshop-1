@@ -1,0 +1,180 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Technology Currency Verification Rule
+
+## Purpose
+
+This rule ensures Cursor always uses the most current documentation, APIs, and best practices for technologies, libraries, and packages by leveraging the context7 MCP server for real-time verification.
+
+## When to Check Technology Currency
+
+### Mandatory Checks
+
+Cursor MUST verify current documentation when:
+
+- Implementing new features with external libraries
+- Suggesting package installations or updates
+- Providing code examples or patterns
+- Troubleshooting technology-specific issues
+- Discussing API usage or configuration
+- Recommending best practices for a technology
+
+### Technology Categories Requiring Verification
+
+- **Frontend Frameworks**: React, Vue, Angular, Svelte, Next.js, Nuxt.js
+- **Backend Frameworks**: Express, Fastify, NestJS, Django, Flask
+- **Databases**: MongoDB, PostgreSQL, MySQL, Redis, Supabase
+- **Cloud Services**: AWS, Azure, GCP, Vercel, Netlify
+- **Build Tools**: Vite, Webpack, Rollup, Parcel, Turbopack
+- **Testing Libraries**: Jest, Vitest, Cypress, Playwright, Testing Library
+- **UI Libraries**: Material-UI, Ant Design, Chakra UI, Tailwind CSS, ShadcnUI
+- **State Management**: Redux, Zustand, Jotai, Pinia
+- **Deployment Tools**: Docker, Kubernetes, PM2
+- **Other**: Zod, Next-Auth, Supabase, PostgreSQL, Prisma
+
+## Implementation Workflow
+
+### Step 1: Knowledge Uncertainty Assessment
+
+Before providing any technical guidance, Cursor should ask itself:
+
+- Is this information from my training data potentially outdated?
+- Have there been recent major updates to this technology?
+- Am I unsure about current best practices?
+- Could API changes affect this implementation?
+
+### Step 2: Context7 MCP Server Query
+
+When uncertainty exists, Cursor MUST:
+
+1. **Pause current implementation**
+2. **Call context7 MCP server** using these functions:
+
+   - `mcp_context7_resolve-library-id` to find the correct library
+   - `mcp_context7_get-library-docs` to fetch latest documentation
+
+3. **Query specific information** such as:
+   - Latest API changes
+   - Current installation methods
+   - Updated configuration patterns
+   - New features and deprecations
+   - Security recommendations
+
+### Step 3: Information Verification
+
+After receiving context7 data:
+
+- Compare retrieved information with initial knowledge
+- Identify any discrepancies or updates
+- Note deprecated methods or outdated practices
+- Verify version-specific recommendations
+
+### Step 4: Updated Implementation
+
+Proceed with implementation using:
+
+- Latest API patterns from context7
+- Current best practices
+- Up-to-date configuration examples
+- Modern security recommendations
+
+## Example Workflow
+
+```
+User Request: "Help me set up authentication with Supabase"
+
+Cursor Internal Process:
+1. "I should verify current Supabase auth patterns"
+2. Call mcp_context7_resolve-library-id for "supabase"
+3. Call mcp_context7_get-library-docs with topic "authentication"
+4. Compare retrieved docs with my knowledge
+5. Proceed with current best practices
+
+Cursor Response: "I've checked the latest Supabase documentation. Here's the current recommended approach for authentication..."
+```
+
+## Documentation Query Guidelines
+
+### Effective Context7 Queries
+
+- **Be specific**: "React 18 server components" not just "React"
+- **Include version**: "Next.js 14 app router" when relevant
+- **Focus topics**: "authentication", "routing", "deployment"
+- **Mention context**: "TypeScript integration", "production setup"
+
+### Information to Always Verify
+
+- Installation commands and package names
+- Import statements and module paths
+- Configuration file structures
+- Environment variable requirements
+- API endpoint patterns
+- Hook usage patterns (React)
+- Lifecycle methods
+- Error handling approaches
+
+## Response Format
+
+When providing updated information, Cursor should:
+
+1. **Acknowledge verification**: "I've verified this with the latest documentation..."
+2. **Highlight changes**: "Note: This approach has changed from previous versions..."
+3. **Provide context**: "According to the current docs..."
+4. **Include version info**: "This applies to [Technology] version X.X and above..."
+
+## Error Prevention
+
+This rule helps prevent:
+
+- Using deprecated APIs
+- Suggesting outdated installation methods
+- Providing incorrect configuration examples
+- Missing new security best practices
+- Ignoring performance improvements
+- Using obsolete patterns
+
+## Integration with Other Rules
+
+This rule works alongside:
+
+- **Dependency Management Rule**: Verify latest versions before suggesting
+- **Auto Cleanup Rules**: Ensure cleanup follows current standards
+- **Documentation Currency Check**: Enhanced version of existing rule
+- **TypeScript Error Handling**: Verify current TypeScript patterns
+
+## Quality Assurance
+
+### Self-Check Questions
+
+Before finalizing any technical response:
+
+- [ ] Did I check if this information could be outdated?
+- [ ] Have I verified current best practices?
+- [ ] Are my examples using the latest API patterns?
+- [ ] Do my recommendations follow current security standards?
+- [ ] Have I considered recent deprecations or changes?
+
+### Continuous Learning
+
+- Keep track of technologies that frequently change
+- Note when context7 reveals significant updates
+- Build awareness of rapidly evolving ecosystems
+- Prioritize verification for cutting-edge technologies
+
+## Benefits
+
+Following this rule ensures:
+
+- ✅ Always current and accurate technical guidance
+- ✅ Reduced debugging time from outdated patterns
+- ✅ Better security through current best practices
+- ✅ Improved performance with latest optimizations
+- ✅ Future-proof implementations
+- ✅ Professional, up-to-date code examples
+
+---
+
+**Remember: Technology moves fast. When in doubt, verify with context7 before proceeding.**
