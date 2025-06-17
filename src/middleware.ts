@@ -27,6 +27,13 @@ export default withAuth(
       }
     }
 
+    // Project creation routes - Admin and Root Admin only
+    if (pathname.startsWith("/projects/create")) {
+      if (!token || (token.role !== "ROOT_ADMIN" && token.role !== "ADMIN")) {
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+      }
+    }
+
     // Root Admin-only routes
     if (pathname.startsWith("/system")) {
       if (!token || token.role !== "ROOT_ADMIN") {
@@ -46,6 +53,19 @@ export default withAuth(
       // Check specific API permissions
       if (
         pathname.startsWith("/api/admin/") &&
+        token.role !== "ROOT_ADMIN" &&
+        token.role !== "ADMIN"
+      ) {
+        return NextResponse.json(
+          { error: "Insufficient permissions" },
+          { status: 403 }
+        );
+      }
+
+      // Project API routes - Admin and Root Admin only
+      if (
+        (pathname.startsWith("/api/projects/create") ||
+          pathname.startsWith("/api/projects/check-name")) &&
         token.role !== "ROOT_ADMIN" &&
         token.role !== "ADMIN"
       ) {
